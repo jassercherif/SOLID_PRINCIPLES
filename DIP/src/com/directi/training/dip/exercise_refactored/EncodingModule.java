@@ -10,10 +10,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Base64;
 
-public class EncodingModule
-{
-    public void encodeWithFiles() throws IOException
-    {
+public class EncodingModule {
+    private final IDataStorage dataStorage;
+
+    // Constructor injection for flexibility
+    public EncodingModule(IDataStorage dataStorage) {
+        this.dataStorage = dataStorage;
+    }
+
+    public void encodeWithFiles() throws IOException {
         BufferedReader reader = null;
         BufferedWriter writer = null;
         try {
@@ -36,40 +41,18 @@ public class EncodingModule
         }
     }
 
-    public void encodeBasedOnNetworkAndDatabase() throws IOException
-    {
-        URL url;
-        url = new URL("http", "myfirstappwith.appspot.com", "/index.html");
-        InputStream in;
-        in = url.openStream();
+    public void encodeBasedOnNetworkAndDatabase() throws IOException {
+        URL url = new URL("http", "myfirstappwith.appspot.com", "/index.html");
+        InputStream in = url.openStream();
         InputStreamReader reader = new InputStreamReader(in);
         StringBuilder inputString1 = new StringBuilder();
-        int c;
-        c = reader.read();
+        int c = reader.read();
         while (c != -1) {
             inputString1.append((char) c);
             c = reader.read();
         }
         String inputString = inputString1.toString();
         String encodedString = Base64.getEncoder().encodeToString(inputString.getBytes());
-        MyDatabase database = new MyDatabase();
-        database.write(encodedString);
+        dataStorage.write(encodedString); // Use the interface to store data
     }
 }
-
-
-
-/**
- @startuml
- class EncodingModule {
-      void encodeWithFiles()
-      void encodeBasedOnNetworkAndDatabase()
- }
-
- class MyDatabase {
-      int write(String inputString)
- }
-
- EncodingModule --> MyDatabase : uses
- @enduml
- */
